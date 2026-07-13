@@ -1,0 +1,43 @@
+package com.grupoestudos.financeflow.service;
+
+import com.grupoestudos.financeflow.enums.Category;
+import com.grupoestudos.financeflow.exception.TransactionNotFoundException;
+import com.grupoestudos.financeflow.model.Transaction;
+import com.grupoestudos.financeflow.repository.TransactionRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class TransactionService {
+
+    private final TransactionRepository transactionRepository;
+
+    public TransactionService(TransactionRepository transactionRepository){
+        this.transactionRepository = transactionRepository;
+    }
+
+    public Transaction save (Transaction transaction) {
+        transaction.setDateCreated(LocalDateTime.now());
+        return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> findAll() {
+        return transactionRepository.findAll();
+    }
+
+    public Transaction findById(Long id) {
+        return transactionRepository.findById(id)
+                .orElseThrow(() -> new TransactionNotFoundException(id));
+    }
+
+    public List<Transaction> findByCategory(Category category){
+        return transactionRepository.findByCategory(category);
+    }
+
+    public void delete(Long id) {
+        Transaction transaction = findById(id);
+        transactionRepository.delete(transaction);
+    }
+}
