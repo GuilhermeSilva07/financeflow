@@ -1,6 +1,8 @@
 package com.grupoestudos.financeflow.service;
 
+import com.grupoestudos.financeflow.dto.SaldoDTO;
 import com.grupoestudos.financeflow.enums.Category;
+import com.grupoestudos.financeflow.enums.TransactionType;
 import com.grupoestudos.financeflow.exception.TransactionNotFoundException;
 import com.grupoestudos.financeflow.model.Transaction;
 import com.grupoestudos.financeflow.repository.TransactionRepository;
@@ -39,5 +41,24 @@ public class TransactionService {
     public void delete(Long id) {
         Transaction transaction = findById(id);
         transactionRepository.delete(transaction);
+    }
+
+    //foi utilizado a "expressão lambda", bora estudar ela, além do stream
+    public SaldoDTO calcularSaldo() {
+        List<Transaction> transacoes = findAll();
+
+        double totalReceitas = transacoes.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .mapToDouble(t -> t.getValue().doubleValue())
+                .sum();
+
+        double totalDespesas = transacoes.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .mapToDouble(t -> t.getValue().doubleValue())
+                .sum();
+
+        double saldo = totalReceitas - totalDespesas;
+
+        return new SaldoDTO(totalReceitas, totalDespesas, saldo);
     }
 }
