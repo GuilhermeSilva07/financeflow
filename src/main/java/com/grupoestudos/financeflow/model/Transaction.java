@@ -22,7 +22,9 @@ public class Transaction {
     // precision = total de dígitos, scale = casas decimais.
     // Sem isso, o Hibernate usa um padrão genérico que pode
     // truncar ou arredondar valores grandes de forma inesperada.
-    @Column(nullable = false, precision = 15, scale = 2)
+    // O nome da coluna foi ajustado para evitar conflito com a palavra reservada "value"
+    // do H2 durante a criação automática da tabela.
+    @Column(name = "transaction_value", nullable = false, precision = 15, scale = 2)
     private BigDecimal value;
 
     // length define o tamanho da coluna VARCHAR no banco.
