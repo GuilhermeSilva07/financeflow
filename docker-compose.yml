@@ -12,5 +12,26 @@ services:
     volumes:
       - financeflow-data:/var/lib/postgresql/data
 
+  app:
+    image: maven:3.8.8-openjdk-17
+    container_name: financeflow-app
+    restart: on-failure
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - m2:/root/.m2
+    depends_on:
+      - postgres
+    environment:
+      FINANCEFLOW_DB_URL: jdbc:postgresql://postgres:5432/financeflow
+      FINANCEFLOW_DB_USERNAME: postgres
+      FINANCEFLOW_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      FINANCEFLOW_DB_DRIVER_CLASS_NAME: org.postgresql.Driver
+      FINANCEFLOW_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+    ports:
+      - "8080:8080"
+    command: mvn -DskipTests spring-boot:run
+
 volumes:
   financeflow-data:
+  m2:
