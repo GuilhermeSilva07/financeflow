@@ -70,6 +70,13 @@ public class TransactionController {
         return ResponseEntity.noContent().build();
     }
 
+    // PUT /transactions/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<Transaction> update(@PathVariable Long id, @RequestBody TransactionDTO dto) {
+        Transaction updated = transactionService.update(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
     @GetMapping("/saldo")
     public ResponseEntity<SaldoDTO> getSaldo() {
         SaldoDTO saldoCalculado = transactionService.calcularSaldo();
