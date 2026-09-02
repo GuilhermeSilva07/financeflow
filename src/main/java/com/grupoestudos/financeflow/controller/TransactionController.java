@@ -7,7 +7,9 @@ import com.grupoestudos.financeflow.model.Transaction;
 import com.grupoestudos.financeflow.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -30,7 +32,17 @@ public class TransactionController {
         transaction.setCategory(dto.getCategory());
 
         Transaction saved = transactionService.save(transaction);
-        return ResponseEntity.ok(saved);
+
+        // Monta a URI apontando para o recurso recém-criado,
+        // reaproveitando a URL atual da requisição (/transactions)
+        // e acrescentando o ID gerado no final (/transactions/{id}).
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(saved);
     }
 
     // GET /transactions
