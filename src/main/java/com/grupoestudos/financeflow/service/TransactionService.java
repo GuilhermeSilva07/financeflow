@@ -1,5 +1,6 @@
 package com.grupoestudos.financeflow.service;
 
+import com.grupoestudos.financeflow.dto.BalanceDTO;
 import com.grupoestudos.financeflow.dto.SaldoDTO;
 import com.grupoestudos.financeflow.dto.TransactionDTO;
 import com.grupoestudos.financeflow.enums.Category;
@@ -9,6 +10,7 @@ import com.grupoestudos.financeflow.model.Transaction;
 import com.grupoestudos.financeflow.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -70,5 +72,24 @@ public class TransactionService {
         double saldo = totalReceitas - totalDespesas;
 
         return new SaldoDTO(totalReceitas, totalDespesas, saldo);
+    }
+
+    public BalanceDTO calculateBalance() {
+        BigDecimal totalIncome = BigDecimal.ZERO;
+        BigDecimal totalExpense = BigDecimal.ZERO;
+
+        List<Transaction> transactions = transactionRepository.findAll();
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getType() == TransactionType.INCOME) {
+                totalIncome = totalIncome.add(transaction.getValue());
+            } else if (transaction.getType() == TransactionType.EXPENSE) {
+                totalExpense = totalExpense.add(transaction.getValue());
+            }
+        }
+
+        BigDecimal balance = totalIncome.subtract(totalExpense);
+
+        return new BalanceDTO(totalIncome, totalExpense, balance);
     }
 }
