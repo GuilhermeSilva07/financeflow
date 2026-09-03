@@ -4,41 +4,26 @@ import com.grupoestudos.financeflow.enums.Category;
 import com.grupoestudos.financeflow.enums.TransactionType;
 import lombok.Data;
 
+// Importante: certifique-se de que os imports começam com "jakarta.validation"
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
-// Os campos deste DTO se parecem com os de Transaction de propósito,
-// mas representam coisas diferentes: isso é o "contrato" do que
-// a API aceita receber, não a estrutura da tabela no banco.
-// Por isso não tem id nem dateCreated — quem preenche esses
-// dois é o banco e a Service, nunca o cliente da API.
-
-// @Data (Lombok): gera automaticamente, em tempo de compilação,
-// getters, setters, toString(), equals() e hashCode() para todos
-// os campos abaixo — sem isso, cada um desses métodos precisaria
-// ser escrito manualmente.
 @Data
 public class TransactionDTO {
 
-    // Descrição da transação (ex: "Almoço", "Salário").
-    // Texto livre, informado pelo cliente da API.
+    @NotBlank(message = "A descrição não pode estar vazia")
     private String description;
 
-    // Valor da transação em reais.
-    // Usa BigDecimal (e não Double) para evitar erros de
-    // arredondamento em valores monetários.
+    @NotNull(message = "O valor é obrigatório")
+    @Positive(message = "O valor deve ser maior que zero")
     private BigDecimal value;
 
-    // Tipo da transação: RECEITA (INCOME) ou DESPESA (EXPENSE).
-    // Como é um enum, o Spring já valida que só um desses dois
-    // valores pode ser aceito.
+    @NotNull(message = "O tipo de transação é obrigatório")
     private TransactionType type;
 
-    // Categoria da transação (ex: FOOD, TRANSPORT, SALARY).
-    // Também é um enum, então valores inválidos são rejeitados
-    // automaticamente pelo Spring.
+    @NotNull(message = "A categoria é obrigatória")
     private Category category;
 
-    // OBS: não há campo "id" nem "dateCreated" aqui de propósito —
-    // esses valores são controlados pelo banco e pela Service,
-    // nunca pelo cliente da API.
 }

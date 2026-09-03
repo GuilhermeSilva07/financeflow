@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid; // 1. NOVO IMPORT: pacote jakarta
 import java.net.URI;
 import java.util.List;
 
@@ -25,7 +26,8 @@ public class TransactionController {
 
     // POST /transactions
     @PostMapping
-    public ResponseEntity<Transaction> create(@RequestBody TransactionDTO dto) {
+    // 2. ALTERAÇÃO: Adicionado o @Valid antes do @RequestBody
+    public ResponseEntity<Transaction> create(@Valid @RequestBody TransactionDTO dto) {
         Transaction transaction = new Transaction();
         transaction.setDescription(dto.getDescription());
         transaction.setValue(dto.getValue());
@@ -34,9 +36,6 @@ public class TransactionController {
 
         Transaction saved = transactionService.save(transaction);
 
-        // Monta a URI apontando para o recurso recém-criado,
-        // reaproveitando a URL atual da requisição (/transactions)
-        // e acrescentando o ID gerado no final (/transactions/{id}).
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -73,7 +72,8 @@ public class TransactionController {
 
     // PUT /transactions/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> update(@PathVariable Long id, @RequestBody TransactionDTO dto) {
+    // 3. ALTERAÇÃO: Adicionado o @Valid antes do @RequestBody também na atualização
+    public ResponseEntity<Transaction> update(@PathVariable Long id, @Valid @RequestBody TransactionDTO dto) {
         Transaction updated = transactionService.update(id, dto);
         return ResponseEntity.ok(updated);
     }
