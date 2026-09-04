@@ -6,6 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+// --- NOVOS IMPORTS AQUI ---
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
@@ -17,12 +21,32 @@ public class GlobalExceptionHandler {
         ApiErrorDTO error = new ApiErrorDTO(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
-                ex.getMessage() // Reaproveita a mensagem configurada na sua Exception
+                ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    // Fallback de segurança: trata qualquer outro erro inesperado (500) para não vazar a stacktrace no Postman
+    // --- NOVO MÉTODO PARA CAPTURAR A VALIDAÇÃO DO @Valid ---
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // Extrai os erros do Spring e formata como "campo: Mensagem"
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.toList());
+
+        ApiErrorDTO errorDTO = new ApiErrorDTO(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de validação nos dados enviados.",
+                errors
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
+    }
+
+    // Fallback de segurança: trata qualquer outro erro inesperado (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleGenericException(Exception ex) {
         ApiErrorDTO error = new ApiErrorDTO(
