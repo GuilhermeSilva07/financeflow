@@ -1,7 +1,6 @@
 package com.grupoestudos.financeflow.controller;
 
 import com.grupoestudos.financeflow.dto.BalanceDTO;
-import com.grupoestudos.financeflow.dto.SaldoDTO;
 import com.grupoestudos.financeflow.dto.TransactionDTO;
 import com.grupoestudos.financeflow.enums.Category;
 import com.grupoestudos.financeflow.model.Transaction;
@@ -76,12 +75,6 @@ public class TransactionController {
     public ResponseEntity<Transaction> update(@PathVariable Long id, @Valid @RequestBody TransactionDTO dto) {
         Transaction updated = transactionService.update(id, dto);
         return ResponseEntity.ok(updated);
-    }
-
-    @GetMapping("/saldo")
-    public ResponseEntity<SaldoDTO> getSaldo() {
-        SaldoDTO saldoCalculado = transactionService.calcularSaldo();
-        return ResponseEntity.ok(saldoCalculado);
     }
 
     @GetMapping("/balance")
