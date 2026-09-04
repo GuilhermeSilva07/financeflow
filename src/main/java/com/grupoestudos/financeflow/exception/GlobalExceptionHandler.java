@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Trata o erro 404 quando um ID não existe no banco
     @ExceptionHandler(TransactionNotFoundException.class)
     public ResponseEntity<ApiErrorDTO> handleTransactionNotFound(TransactionNotFoundException ex) {
         ApiErrorDTO error = new ApiErrorDTO(
@@ -26,10 +25,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
-    // --- NOVO MÉTODO PARA CAPTURAR A VALIDAÇÃO DO @Valid ---
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorDTO> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        // Extrai os erros do Spring e formata como "campo: Mensagem"
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -46,7 +43,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
     }
 
-    // Fallback de segurança: trata qualquer outro erro inesperado (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleGenericException(Exception ex) {
         ApiErrorDTO error = new ApiErrorDTO(

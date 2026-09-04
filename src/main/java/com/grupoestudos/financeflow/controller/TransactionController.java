@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import jakarta.validation.Valid; // 1. NOVO IMPORT: pacote jakarta
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -23,9 +23,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    // POST /transactions
     @PostMapping
-    // 2. ALTERAÇÃO: Adicionado o @Valid antes do @RequestBody
     public ResponseEntity<Transaction> create(@Valid @RequestBody TransactionDTO dto) {
         Transaction transaction = new Transaction();
         transaction.setDescription(dto.getDescription());
@@ -44,34 +42,28 @@ public class TransactionController {
         return ResponseEntity.created(location).body(saved);
     }
 
-    // GET /transactions
     @GetMapping
     public ResponseEntity<List<Transaction>> findAll() {
         return ResponseEntity.ok(transactionService.findAll());
     }
 
-    // GET /transactions/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Transaction> findById(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.findById(id));
     }
 
-    // GET /transactions/category/{category}
     @GetMapping("/category/{category}")
     public ResponseEntity<List<Transaction>> findByCategory(@PathVariable Category category) {
         return ResponseEntity.ok(transactionService.findByCategory(category));
     }
 
-    // DELETE /transactions/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         transactionService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // PUT /transactions/{id}
     @PutMapping("/{id}")
-    // 3. ALTERAÇÃO: Adicionado o @Valid antes do @RequestBody também na atualização
     public ResponseEntity<Transaction> update(@PathVariable Long id, @Valid @RequestBody TransactionDTO dto) {
         Transaction updated = transactionService.update(id, dto);
         return ResponseEntity.ok(updated);
